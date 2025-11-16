@@ -11,7 +11,7 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 
-st.title("Probabilidad Bayesiana de Subida Basada en MA5 > MA10")
+st.title("Ranking Bayesiano: TOP 30 Acciones con Mayor Probabilidad de Subida")
 
 acciones = [
 "^GSPC","BTC-USD", "NVDA", "BABA", "VISTAA.MX", "DANHOS13.MX", "EDUCA18.MX",
@@ -40,77 +40,53 @@ acciones = [
 "NFLX", "IONQ", "QUBT", "QBTS", "RGTI", "PLTR"
 ]
 
-st.sidebar.header("Configuración")
+st.info("Calculando probabilidades… Esto puede tardar 5–20 segundos según tu conexión.")
 
-seleccion = st.sidebar.multiselect(
-    "Selecciona acciones para analizar:",
-    options=acciones,
-    default=["^GSPC","BTC-USD", "NVDA", "BABA", "VISTAA.MX", "DANHOS13.MX", "EDUCA18.MX", 
-"FIBRAMQ12.MX", "FIBRAPL14.MX", "FIHO12.MX", "FINN13.MX", "FMTY14.MX",
-"FPLUS16.MX", "FSHOP13.MX", "FUNO11.MX", "ACCELSAB.MX", "AGUA.MX", "ALFAA.MX",
-"ASURB.MX", "CADUA.MX", "CERAMICB.MX", "DINEB.MX", "GAPB.MX", "GCARSOA1.MX",
-"GISSAA.MX", "GMD.MX", "GMXT.MX", "HOMEX.MX", "JAVER.MX", "KUOB.MX",
-"OMAB.MX", "ORBIA.MX", "PASAB.MX", "PINFRAL.MX", "SITES1A-1.MX", "TMMA.MX",
-"TRAXIONA.MX", "VESTA.MX", "VINTE.MX", "VOLARA.MX", "ALPEKA.MX", "AUTLANB.MX",
-"CEMEXCPO.MX", "CMOCTEZ.MX", "COLLADO.MX", "CONVERA.MX", "CYDSASAA.MX",
-"GCC.MX", "GMEXICOB.MX", "ICHB.MX", "LAMOSA.MX", "MFRISCOA-1.MX",
-"PE&OLES.MX", "POCHTECB.MX", "SIMECB.MX", "TEAKCPO.MX", "VITROA.MX",
-"AC.MX", "BIMBOA.MX", "CHDRAUIB.MX", "CUERVO.MX", "CULTIBAB.MX", 
-"FEMSAUBD.MX", "GIGANTE.MX", "GRUMAB.MX", "HERDEZ.MX", "KIMBERA.MX",
-"KOFUBL.MX", "LACOMERUBC.MX", "MINSAB.MX", "SORIANAB.MX", "WALMEX.MX",
-"BEVIDESB.MX", "FRAGUAB.MX", "LABB.MX", "MEDICAB.MX", "AMXB.MX",
-"AXTELCPO.MX", "CABLECPO.MX", "CTAXTELA.MX", "MEGACPO.MX", "TLEVISACPO.MX",
-"ACTINVRB.MX", "BBAJIOO.MX", "BOLSAA.MX", "CREAL.MX", "FINAMEXO.MX",
-"FINDEP.MX", "GBMO.MX", "GENTERA.MX", "GFINBURO.MX", "GFNORTEO.MX",
-"GNP.MX", "GPROFUT.MX", "INVEXA.MX", "PROCORPB.MX", "Q.MX", "RA.MX",
-"AGUILASCPO.MX", "ALSEA.MX", "CIDMEGA.MX", "CIEB.MX", "CMRB.MX",
-"HCITY.MX", "HOTEL.MX", "LIVEPOL1.MX", "NEMAKA.MX", "POSADASA.MX",
-"RLHA.MX", "SPORTS.MX", "VASCONI.MX", "ARKB", "BTCW", "BTCO", "BITB",
-"HODL", "EZBC", "FBTC", "BRRR", "GBTC", "DEFI", "IBIT", "ACWI", 
-"SPY", "FAS", "SPXL", "TECL", "IAU", "NU", "MELI", "META", 
-"NFLX", "IONQ", "QUBT", "QBTS", "RGTI", "PLTR"]
-)
+resultados = []
 
-if st.sidebar.button("Calcular"):
-    resultados = []
+for ticker in acciones:
+    try:
+        data = yf.download(ticker, period="1mo", interval="1d")
 
-    for ticker in seleccion:
-        try:
-            data = yf.download(ticker, period="1mo", interval="1d")
+        if data.empty:
+            continue
 
-            if data.empty:
-                continue
+        # Medias móviles
+        data["MA5"] = data["Close"].rolling(5).mean()
+        data["MA10"] = data["Close"].rolling(10).mean()
+        data["Signal"] = (data["MA5"] > data["MA10"]).astype(int)
 
-            # Medias móviles
-            data["MA5"] = data["Close"].rolling(5).mean()
-            data["MA10"] = data["Close"].rolling(10).mean()
-            data["Signal"] = (data["MA5"] > data["MA10"]).astype(int)
+        # Rendimiento diario
+        data["Return"] = data["Close"].pct_change()
+        data["Up"] = (data["Return"] > 0).astype(int)
 
-            # Rendimiento
-            data["Return"] = data["Close"].pct_change()
-            data["Up"] = (data["Return"] > 0).astype(int)
+        # Probabilidades
+        p_up = data["Up"].mean()
+        p_down = 1 - p_up
 
-            p_up = data["Up"].mean()
-            p_down = 1 - p_up
+        p_signal_given_up = data[data["Up"] == 1]["Signal"].mean()
+        p_signal_given_down = data[data["Up"] == 0]["Signal"].mean()
 
-            p_signal_given_up = data[data["Up"] == 1]["Signal"].mean()
-            p_signal_given_down = data[data["Up"] == 0]["Signal"].mean()
+        p_signal = p_signal_given_up * p_up + p_signal_given_down * p_down
 
-            p_signal = p_signal_given_up * p_up + p_signal_given_down * p_down
+        p_up_given_signal = 0
+        if p_signal > 0:
+            p_up_given_signal = (p_signal_given_up * p_up) / p_signal
 
-            p_up_given_signal = 0
-            if p_signal > 0:
-                p_up_given_signal = (p_signal_given_up * p_up) / p_signal
+        resultados.append([ticker, p_up_given_signal])
 
-            resultados.append([ticker, p_up_given_signal])
+    except Exception as e:
+        st.write(f"Error con {ticker}: {e}")
 
-        except Exception as e:
-            st.write(f"Error con {ticker}: {e}")
+# Ranking final
+df = pd.DataFrame(resultados, columns=["Accion", "P(Subida|Señal)"])
+df = df.sort_values(by="P(Subida|Señal)", ascending=False).reset_index(drop=True)
 
-    df = pd.DataFrame(resultados, columns=["Accion", "P(Subida|Señal)"])
-    df = df.sort_values(by="P(Subida|Señal)", ascending=False).reset_index(drop=True)
+top30 = df.head(30)
 
-    st.subheader("Resultados")
-    st.dataframe(df)
+st.subheader("TOP 30 Acciones con Mayor Probabilidad de Subida (Bayes)")
+st.dataframe(top30)
 
-    st.success("Cálculo completado.")
+# Exportar CSV
+csv = top30.to_csv(index=False).encode("utf-8")
+st.download_button("Descargar TOP 30 en CSV", csv, "top30_bayes.csv")
