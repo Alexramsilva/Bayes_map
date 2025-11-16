@@ -11,8 +11,6 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 
-
-
 st.title("Ranking Bayesiano: TOP 30 Acciones con Mayor Probabilidad de Subida")
 
 acciones = [
