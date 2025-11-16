@@ -89,4 +89,16 @@ st.dataframe(top30)
 
 # Exportar CSV
 csv = top30.to_csv(index=False).encode("utf-8")
+
+# Personalización de diseño
+st.markdown("""
+<style>
+    .stApp {
+        background-color:  #00FF00;
+    }
+    .css-1d391kg {
+        color:  #faf7f8;
+    }
+</style>
+""", unsafe_allow_html=True)
 st.download_button("Descargar TOP 30 en CSV", csv, "top30_bayes.csv")
