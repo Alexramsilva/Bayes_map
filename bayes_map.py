@@ -10,6 +10,7 @@ Original file is located at
 import streamlit as st
 import yfinance as yf
 import pandas as pd
+import numpy as np
 
 st.title("Ranking Bayesiano: TOP 30 Acciones con Mayor Probabilidad de Subida")
 
