@@ -13,6 +13,18 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Personalización de diseño
+st.markdown("""
+<style>
+    .stApp {
+        background-color:  #00FF00;
+    }
+    .css-1d391kg {
+        color:  #faf7f8;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # -----------------------------------------------------
 # PRIMER CÓDIGO (NO MODIFICADO — SOLO SE AGREGA AL FINAL)
 # -----------------------------------------------------
