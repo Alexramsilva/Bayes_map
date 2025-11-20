@@ -92,3 +92,77 @@ csv = top30.to_csv(index=False).encode("utf-8")
 
 st.download_button("Descargar TOP 30 en CSV", csv, "top30_bayes.csv")
 
+
+# -----------------------------------------------------
+# SEGUNDO CÓDIGO
+# -----------------------------------------------------
+
+st.write(f"Descargando datos de **{ticker}**...")
+
+df = yf.download(ticker, period="2y", interval="1d")
+
+if df.empty:
+    st.error("No hay datos disponibles.")
+    st.stop()
+
+# CÁLCULOS
+df["MA5"] = df["Close"].rolling(5).mean()
+df["MA10"] = df["Close"].rolling(10).mean()
+df.dropna(inplace=True)
+
+df["Signal"] = np.where(df["MA5"] > df["MA10"], 1, 0)
+df["Crossover"] = df["Signal"].diff()
+
+# MODELO DE HOOKE
+close_values = df["Close"].values.flatten()
+ma10_values = df["MA10"].values.flatten()
+
+df["x"] = close_values - ma10_values
+k = 0.001
+df["Force"] = -k * df["x"]
+
+threshold = df["x"].std() * 1.5
+df["Exit"] = np.where(abs(df["x"]) > threshold, 1, 0)
+
+# GRÁFICO PRINCIPAL
+fig, ax1 = plt.subplots(figsize=(14, 7))
+
+ax1.plot(df["Close"], label="Precio", color="black", linewidth=1)
+ax1.plot(df["MA10"], label="Media móvil (equilibrio)", color="orange")
+
+ax1.fill_between(
+    df.index,
+    df["MA10"] - threshold,
+    df["MA10"] + threshold,
+    color="green",
+    alpha=0.2,
+    label="Zona elástica (Hooke)"
+)
+
+df["Exit_diff"] = df["Exit"].diff()
+exit_dates = df[(df["Exit_diff"] == 1) & (df["MA5"] > df["MA10"])].index
+entry_dates = df[(df["Exit_diff"] == -1) & (df["MA5"] < df["MA10"])].index
+
+for date in exit_dates:
+    ax1.axvline(x=date, color="red", linestyle="--", alpha=0.5)
+    ax1.text(date, df["Close"].max(), "S", color="red", fontsize=8, rotation=90, va="top")
+
+for date in entry_dates:
+    ax1.axvline(x=date, color="green", linestyle="--", alpha=0.5)
+    ax1.text(date, df["Close"].min(), "E", color="green", fontsize=8, rotation=90, va="bottom")
+
+ax1.set_xlabel("Fecha")
+ax1.set_ylabel("Precio")
+ax1.grid(True)
+ax1.legend(loc="upper left")
+
+ax2 = ax1.twinx()
+ax2.plot(df["Force"], label="Fuerza (-k*x)", color="blue", linestyle="--", alpha=0.7)
+ax2.set_ylabel("Fuerza (k*x)")
+ax2.legend(loc="lower left")
+
+plt.title(f"Modelo del Resorte de Hooke aplicado al precio de {ticker}")
+
+st.pyplot(fig)
+
+
