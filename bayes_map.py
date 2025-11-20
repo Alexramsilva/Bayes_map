@@ -94,7 +94,8 @@ csv = top30.to_csv(index=False).encode("utf-8")
 
 st.download_button("Descargar TOP 30 en CSV", csv, "top30_bayes.csv")
 
-
+# Guarda el dataframe en el estado de la sesión para usarlo en la otra sección
+    st.session_state["top30"] = top30
 # -----------------------------------------------------
 # OPCIÓN 2: ANÁLISIS DEL ACTIVO (SEGUNDO CÓDIGO)
 # -----------------------------------------------------
