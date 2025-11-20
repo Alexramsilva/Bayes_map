@@ -12,9 +12,16 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
-st.title("Ranking Bayesiano: TOP 30 Acciones con Mayor Probabilidad de Subida")
+# -----------------------------------------------------
+# TÍTULO
+# -----------------------------------------------------
+st.title("Ranking Bayesiano y Análisis con Hooke")
 
+# -----------------------------------------------------
+# LISTA DE ACCIONES
+# -----------------------------------------------------
 acciones = [
 "^GSPC","BTC-USD", "NVDA", "BABA", "VISTAA.MX", "DANHOS13.MX", "EDUCA18.MX",
 "FIBRAMQ12.MX", "FIBRAPL14.MX", "FIHO12.MX", "FINN13.MX", "FMTY14.MX",
@@ -42,7 +49,10 @@ acciones = [
 "NFLX", "IONQ", "QUBT", "QBTS", "RGTI", "PLTR", "SOFI", "HOOD",
 ]
 
-st.info("Calculando probabilidades… Esto puede tardar 5–20 segundos según tu conexión.")
+# -----------------------------------------------------
+# RANKING BAYESIANO
+# -----------------------------------------------------
+st.info("Calculando probabilidades bayesianas…")
 
 resultados = []
 
@@ -53,16 +63,13 @@ for ticker in acciones:
         if data.empty:
             continue
 
-        # Medias móviles
         data["MA5"] = data["Close"].rolling(5).mean()
         data["MA10"] = data["Close"].rolling(10).mean()
         data["Signal"] = (data["MA5"] > data["MA10"]).astype(int)
 
-        # Rendimiento diario
         data["Return"] = data["Close"].pct_change()
         data["Up"] = (data["Return"] > 0).astype(int)
 
-        # Probabilidades
         p_up = data["Up"].mean()
         p_down = 1 - p_up
 
@@ -77,25 +84,35 @@ for ticker in acciones:
 
         resultados.append([ticker, p_up_given_signal])
 
-    except Exception as e:
-        st.write(f"Error con {ticker}: {e}")
+    except:
+        pass
 
-# Ranking final
 df = pd.DataFrame(resultados, columns=["Accion", "P(Subida|Señal)"])
 df = df.sort_values(by="P(Subida|Señal)", ascending=False).reset_index(drop=True)
-
 top30 = df.head(30)
 
-st.subheader("TOP 30 Acciones con Mayor Probabilidad de Subida (Bayes)")
-st.dataframe(top30)
+# -----------------------------------------------------
+# MENÚ DESPLEGABLE PRINCIPAL
+# -----------------------------------------------------
+st.subheader("Menú")
+opcion = st.selectbox(
+    "Selecciona qué quieres ver:",
+    [
+        "Ver TOP 30",
+        "Analizar un activo del TOP 30"
+    ]
+)
 
-# Exportar CSV
-csv = top30.to_csv(index=False).encode("utf-8")
+# -----------------------------------------------------
+# OPCIÓN 1: MOSTRAR TABLA TOP 30
+# -----------------------------------------------------
+if opcion == "Ver TOP 30":
+    st.subheader("TOP 30 Acciones con Mayor Probabilidad Bayesiana")
+    st.dataframe(top30)
 
-st.download_button("Descargar TOP 30 en CSV", csv, "top30_bayes.csv")
+    csv = top30.to_csv(index=False).encode("utf-8")
+    st.download_button("Descargar CSV del TOP 30", csv, "top30_bayes.csv")
 
-# Guarda el dataframe en el estado de la sesión para usarlo en la otra sección
-    st.session_state["top30"] = top30
 # -----------------------------------------------------
 # OPCIÓN 2: ANÁLISIS DEL ACTIVO (SEGUNDO CÓDIGO)
 # -----------------------------------------------------
@@ -141,4 +158,31 @@ elif opcion == "Analizar un activo del TOP 30":
     ax1.legend()
     st.pyplot(fig)
 
+    # HISTOGRAMA Y SANKEY
+    precios = df["Close"].values.ravel()
+    n = len(precios)
+    k_int = int(1 + np.log2(n))
 
+    bins = np.linspace(min(precios), max(precios), k_int)
+    precios_categorizados = pd.cut(precios, bins=bins, right=False)
+
+    tabla_frec = precios_categorizados.value_counts().sort_index()
+    frec_rel = tabla_frec / n
+
+    tabla = pd.DataFrame({
+        'Intervalo': [str(i) for i in tabla_frec.index],
+        'Frecuencia Absoluta': tabla_frec.values,
+        'Frecuencia Relativa': frec_rel.values
+    })
+
+    labels = list(tabla['Intervalo']) + ["Total"]
+    sources = list(range(len(tabla)))
+    targets = [len(tabla)] * len(tabla)
+    values = tabla['Frecuencia Absoluta'].tolist()
+
+    fig2 = go.Figure(go.Sankey(
+        node=dict(label=labels),
+        link=dict(source=sources, target=targets, value=values)
+    ))
+    fig2.update_layout(title_text="Distribución de Precios - Sankey")
+    st.plotly_chart(fig2)
