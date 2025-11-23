@@ -96,7 +96,7 @@ for ticker in acciones:
 df = pd.DataFrame(resultados, columns=["Accion", "P(Subida|Señal)"])
 df = df.sort_values(by="P(Subida|Señal)", ascending=False).reset_index(drop=True)
 
-top30 = df.head(30)
+top30 = df.head(40)
 
 st.subheader("TOP 30 Acciones con Mayor Probabilidad de Subida (Bayes)")
 st.dataframe(top30)
