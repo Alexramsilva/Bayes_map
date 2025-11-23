@@ -143,6 +143,16 @@ fig, ax1 = plt.subplots(figsize=(14, 7))
 ax1.plot(df2["Close"], label="Precio", linewidth=1)
 ax1.plot(df2["MA10"], label="Media móvil (equilibrio)", linewidth=1.2)
 
+# Punto del último valor
+ax1.scatter(
+    df2.index[-1],           # x
+    df2["Close"].iloc[-1],   # y
+    color='red',
+    s=40,
+    zorder=5,
+    label="Último valor"
+)
+# ####  Retirada   ####
 ax1.fill_between(
     df2.index,
     df2["MA10"] - threshold,
