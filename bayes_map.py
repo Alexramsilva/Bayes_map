@@ -58,7 +58,7 @@ acciones = [
 "NFLX", "IONQ", "QUBT", "QBTS", "RGTI", "PLTR", "SOFI", "HOOD",
 ]
 
-st.info("Calculando probabilidades… Esto puede tardar 5–20 segundos según tu conexión.")
+st.info("Calculando probabilidades… Esto puede tardar 5–20 segundos según tu conexión, mientras disfruta de tu cafecito.")
 
 resultados = []
 
