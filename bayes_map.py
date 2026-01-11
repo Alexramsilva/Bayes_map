@@ -55,7 +55,7 @@ acciones = [
 "RLHA.MX", "SPORTS.MX", "VASCONI.MX", "ARKB", "BTCW", "BTCO", "BITB",
 "HODL", "EZBC", "FBTC", "BRRR", "GBTC", "DEFI", "IBIT", "ACWI",
 "SPY", "FAS", "SPXL", "TECL", "IAU", "NU", "MELI", "META",
-"NFLX", "IONQ", "QUBT", "QBTS", "RGTI", "PLTR", "SOFI", "HOOD","FRES.MX", "MCHI", "INDA"
+"NFLX", "IONQ", "QUBT", "QBTS", "RGTI", "PLTR", "SOFI", "HOOD","FRES.MX", "MCHI", "INDA", "JPM", "AMZN", "AMD", "TSM", "GOOGL"
 ]
 
 st.info("Calculando probabilidades… Esto puede tardar 5–20 segundos según tu conexión, mientras disfruta de tu cafecito.")
