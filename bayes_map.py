@@ -31,8 +31,8 @@ st.markdown("""
 
 st.title("Ranking Bayesiano: TOP 30 Acciones con Mayor Probabilidad de Subida")
 
-acciones = [
-"^GSPC","BTC-USD", "NVDA", "BABA", "VISTAA.MX", "DANHOS13.MX", "EDUCA18.MX",
+acciones = ["GAPB.MX","SPY", "GRUMAB.MX", "IAU",  "NVDA","WALMEX.MX","QUBT", "QTUM", 
+"GMEXICOB.MX", "AVGO", "ASURB.MX", "QBTS" , "^GSPC","BTC-USD", "NVDA", "BABA", "VISTAA.MX", "DANHOS13.MX", "EDUCA18.MX",
 "FIBRAMQ12.MX", "FIBRAPL14.MX", "FIHO12.MX", "FINN13.MX", "FMTY14.MX",
 "FPLUS16.MX", "FSHOP13.MX", "FUNO11.MX", "ACCELSAB.MX", "AGUA.MX", "ALFAA.MX",
 "ASURB.MX", "CADUA.MX", "CERAMICB.MX", "DINEB.MX", "GAPB.MX", "GCARSOA1.MX",
@@ -55,7 +55,8 @@ acciones = [
 "RLHA.MX", "SPORTS.MX", "VASCONI.MX", "ARKB", "BTCW", "BTCO", "BITB",
 "HODL", "EZBC", "FBTC", "BRRR", "GBTC", "DEFI", "IBIT", "ACWI",
 "SPY", "FAS", "SPXL", "TECL", "IAU", "NU", "MELI", "META",
-"NFLX", "IONQ", "QUBT", "QBTS", "RGTI", "PLTR", "SOFI", "HOOD","FRES.MX", "MCHI", "INDA", "JPM", "AMZN", "AMD", "TSM", "GOOGL"
+"JPM","NFLX", "IONQ", "RGTI", "PLTR", "SOFI", "HOOD", "FRES.MX", "MCHI", "INDA", "TSM", "AMD", "GOOGL", "AMZN","V"
+
 ]
 
 st.info("Calculando probabilidades… Esto puede tardar 5–20 segundos según tu conexión, mientras disfruta de tu cafecito.")
