@@ -31,7 +31,7 @@ st.markdown("""
 
 st.title("Ranking Bayesiano: TOP 30 Acciones con Mayor Probabilidad de Subida")
 
-acciones = ["GAPB.MX","SPY", "GRUMAB.MX",  "NVDA","WALMEX.MX","QUBT", "QTUM", 
+acciones = ["GAPB.MX","SPY","NVDA","WALMEX.MX","QUBT", "QTUM", 
  "AVGO", "ASURB.MX", "QBTS" , "^GSPC","BTC-USD", "NVDA", "BABA", "VISTAA.MX", "DANHOS13.MX", "EDUCA18.MX",
 "FIBRAMQ12.MX", "FIBRAPL14.MX", "FIHO12.MX", "FINN13.MX", "FMTY14.MX",
 "FPLUS16.MX", "FSHOP13.MX", "FUNO11.MX", "ACCELSAB.MX", "AGUA.MX", "ALFAA.MX",
